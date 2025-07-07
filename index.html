@@ -392,13 +392,11 @@
 
                 const handleError = (event) => {
                     console.error('Speech recognition error:', event.error, event.message);
-                    if (event.error === 'no-speech') {
-                         toast({ title: "No speech detected", description: "Mic is off. Click to start again.", variant: "info" });
-                         setIsListening(false);
-                    } else if (event.error === 'network') {
-                        // Let the 'end' handler restart.
+                    if (event.error === 'no-speech' || event.error === 'network') {
+                        // Non-critical errors, we'll let the onend handler restart recognition.
+                        // No need to show a toast, as it should be a seamless restart.
                     } else {
-                        toast({ title: "Speech Error", description: `Error: ${event.error}.`, variant: "destructive" });
+                        toast({ title: "Speech Error", description: `Error: ${event.error}. Mic is off.`, variant: "destructive" });
                         setIsListening(false); // Stop for other critical errors
                     }
                 };
