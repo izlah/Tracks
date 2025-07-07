@@ -96,7 +96,7 @@
 
         // --- INITIAL DATA CONFIGURATION ---
         const INITIAL_KEYWORDS = {
-            'fake information': {
+            fake : {
                 tone: "Thoughtful",
                 category: "Brushoff",
                 content: "Thats a valid concern. What if people just put random information just to see what it shows?\n\nBut when we think about the whole process it takes to complete it...Lets say you saw one of our ads and click on it. You put fake information in the survey just to see what its going to suggest. You completed 40 questions..Now its asking to verify the cell phone number. Would you submit your phone number in internet to get a fake report based on the fake information you submitted?"
@@ -106,7 +106,7 @@
                 category: "Concern",
                 content: "Yeh you are right. I have seen some of those reviews online\n\nWe are not claiming everyone in our platform found success. As I said, its not a silver bullet. But those people who are following our process, we see a booking rate of 30%. It could mean that there are advisors with 10% booking rate and 50% rate. If you take any sample, there are people who find success, and who doesnt. And ofcourse its the people who were not doing their best to reach out to the leads who wont benefit from this. We all make decision based on what others say about it. This is the reason for 3 day trial. So that you can talk to other advisors in our platform and ask them their experience and make an informed decision rather than relying on internet or one person. You can also extend it if you want more time to learn from others who are using the platform and once you are ready, you will start receiving prospects.Again, there are no contracts. So after a month, you can just cancel it."
             },
-            'asset value': {
+            high : {
                 tone: "Concern",
                 category: "Objection",
                 content: "Yeh. this could be a problem if you have a hard minimum\n\nOur average is $500K. But we will send you households who have more than that amount, and then people who have less. These are usually young professional, like a doctor or software developer for example, with high income, high monthly savings, insurance needs, but low investable assets. Would you take these prospects?\n\nSince you have a high asset requirement, Can I bounce an idea ?\n- There are three ways to increase the chances of getting high net worth clients. First is by increasing the number of leads per month. packages above 50 are meant for this. Another way is that you can choose a zip code that is highly populated and affluent.You can try different zip codes on weekly basis to optimize the averages."
@@ -131,12 +131,12 @@
                 category: "Brushoff",
                 content: "Definitely the price should make sense to you\n\nIts expensive compared to other solutions or you dont think the outcome will justify the cost?\n\nApart from the cost, is there something else thats giving you a pause?\n\nSo you dont see the ROI?"
             },
-            'not ready': {
+            ready: {
                 tone: "Concern",
                 category: "Objection",
                 content: "Yeh. Capacity is really important. If you dont have the time to reach out, these leads will go cold.\n\nApart from timing, is there any other issues thats giving you pause?\n\nIf you are serious about our program Can I bounce an Idea off you?\nI mentioned about trial period.Instead of 3 daysI I can extend it for X weeks. \nWe currently have some promotions going on and this is based on states. Since XX is Green/Orange state now you get 10-15%.And this applied to every month. But if you join after YY Weeks/Months and the capacity of state is low the discount will also change. You can lock the spot with discount.\nAnd if you change your mind during the trial period, you can cancel and you get complete refund.\nWe will part ways and someone else take the spot.\n\nHow does that sound? It takes only 2-3 mins"
             },
-            'time to think': {
+            time: {
                 tone: "Reassuring",
                 category: "Brushoff",
                 content: "Definitely, Its.....Something new and you need to think about it\n\nBut to understand your situation, is it because of capacity issues , do you want to do some research or you just need to sleep on it?\n\n\nSure (Name) - Take your time. Lets schedule a follow up call tomorrow... let me check my Calendar\n\nI have a slot available tomorrow 3PM EST. Is that okay for you?\n\n-Just to make sure I could share you some relevant information. What were the things that were causing you the most concern?.. So that we can focus our next conversation on that."
@@ -151,31 +151,24 @@
                 category: "Brushoff",
                 content: "Yeh ofcourse. You should do your due diligence before making a decision\n\nWhat are some aspect of our program that you are skeptical about?\n\nCan I bounce an Idea off you?\n\nResearch - You can either look it up on Google or find someone who’s using Planswell, or just chat with a bunch of users during one of our meetup sessions\nAs I mentioned, we have meetup sessions called Plancraft on every Wednesdays and Thursdays..\nyou can interact with other advisors and agents and see how it is working for them.\nYou can expect 30-40 people in a session. And they talk about industry, success stories, best practices.. things like that\n\nYou can hop in and raise a hand ask them some questions. !! And see how is working for them.\nThis could help you to make that *informed decision*. It is available during the trial\n\nSo you can signup for a trial \nand extend it to a week. \n\nDuring the week talk to others and go through the resources.  And if you dont like it, just cancel and you get complete refund.\n\nYou are definitley gonna impressed by that...in that case you get to keep your spot and we will start sending you leads..\n\nHow does that sound?"
             },
-            'quality of leads': {
+            quality: {
                 tone: "Curious",
                 category: "Concern",
                 content: "Yeh. Quality of lead is important.\n\nAre you concerned that the leads might be cold or that people might submit incorrect information"
             },
-            'cold leads': {
+            cold : {
                 tone: "Reassuring",
                 category: "Concern",
                 content: "Yeh. The client should have some pain points. Otherwise its a cold leads\n\nThese are not cold leads, there is a reason why they take the effort to go through all the process and verify their phone numbers. And when they see the plan that we generate, it doesnt show any actionable advice. So there is still a pain and if you could call them within a day or two, they still remember. Its not Hot leads because they dont know you, but they are warm... If you dont call them within a week, they may forget and become cold\n\nSo if you follow our script, call within a day or two you have more chances of seeing 30% booking rate"
             },
-            time: {
-                tone: "Reassuring",
-                category: "Brushoff",
-                content: "The current time is Saturday, July 5, 2025 at 1:06 AM EDT."
-            },
             consent: { tone: "Concern", category: "Concerns", content: "Please add your response for 'consent' here." },
-            'i dont need coaching waive off $199': { tone: "Concern", category: "Objections", content: "Please add your response here." },
-            'not supposed to call dnc list': { tone: "Concern", category: "Concerns", content: "Please add your response here." },
-            'cant join using personal account': { tone: "Concern", category: "Concerns", content: "Please add your response here." },
-            'they make claims but doesnt deliver': { tone: "Concern", category: "Objections", content: "Please add your response here." },
-            'the average doesnt mean anything': { tone: "Curious", category: "Objections", content: "Please add your response here." },
-            'for the return, client should stick for 12 months': { tone: "Curious", category: "Concerns", content: "Please add your response here." },
-            'i need younger clients': { tone: "Curious", category: "Concerns", content: "Please add your response here." },
-            'cant pay upfront': { tone: "Concern", category: "Objections", content: "Please add your response here." },
-            'need appointments': { tone: "Curious", category: "Concerns", content: "Please add your response for 'need appointments' here." },
+            'Setup fee': { tone: "Concern", category: "Objections", content: "Please add your response here." },
+            'DNC': { tone: "Concern", category: "Concerns", content: "Please add your response here." },
+            'Personal': { tone: "Concern", category: "Concerns", content: "Please add your response here." },
+            'Competetors': { tone: "Concern", category: "Objections", content: "Please add your response here." },
+            'younger': { tone: "Curious", category: "Concerns", content: "Please add your response here." },
+            'upfront': { tone: "Concern", category: "Objections", content: "Please add your response here." },
+            'appointments': { tone: "Curious", category: "Concerns", content: "Please add your response for 'need appointments' here." },
         };
 
         // --- Keyword Editor Modal Component ---
@@ -472,7 +465,6 @@
                     return prev;
                 });
                 setBottomNotification(`'${keyword}' response available`);
-                setIsSidebarOpen(false);
             };
 
             const handleGoBack = () => {
@@ -621,6 +613,10 @@
                     Reassuring: { text: 'text-yellow-300' }
                 };
 
+                const sortedKeywords = Object.entries(keywords).sort(([, a], [, b]) => {
+                    return a.category.localeCompare(b.category);
+                });
+
                 return (
                     <div className="p-4 sm:p-6 lg:p-8">
                         <header className="flex justify-between items-center mb-8">
@@ -631,7 +627,7 @@
                             </button>
                         </header>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                            {Object.entries(keywords).map(([keyword, data]) => {
+                            {sortedKeywords.map(([keyword, data]) => {
                                 const currentToneClasses = toneClasses[data.tone] || toneClasses.Curious;
                                 return (
                                 <div key={keyword} className="bg-gray-800 rounded-lg p-4 flex flex-col min-h-[18rem] relative">
@@ -662,18 +658,76 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                                 Add Keyword
                             </button>
-                            <ul className="space-y-1 flex-grow overflow-y-auto">
-                                {Object.keys(keywords).sort().map(kw => (
-                                    <li key={kw}>
-                                        <button 
-                                            onClick={() => handleKeywordClick(kw)}
-                                            className="w-full text-left p-2 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                                        >
-                                            {kw}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                                                        <div className="flex-grow overflow-y-auto">
+                                {(() => {
+                                    const sidebarStructure = [
+                                        {
+                                            category: 'Lead quality',
+                                            keywords: ['quality', 'cold', 'fake', 'appointments', 'reviews', 'DNC', 'Competetors']
+                                        },
+                                        {
+                                            category: 'Compliance',
+                                            keywords: ['compliance', 'consent', 'DNC', 'Personal']
+                                        },
+                                        {
+                                            category: 'Pricing',
+                                            keywords: ['expensive', 'Setup fee', 'upfront']
+                                        },
+                                        {
+                                            category: 'Timing',
+                                            keywords: ['time', 'research', 'ready', 'partner']
+                                        },
+                                        {
+                                            category: 'Specification',
+                                            keywords: ['zip', 'high', 'older', 'younger']
+                                        }
+                                    ];
+
+                                    const allCategorizedKeywords = new Set(sidebarStructure.flatMap(g => g.keywords));
+                                    const otherKeywords = Object.keys(keywords).filter(k => !allCategorizedKeywords.has(k)).sort((a, b) => a.localeCompare(b));
+
+                                    return (
+                                        <>
+                                            {sidebarStructure.map(group => (
+                                                <div key={group.category}>
+                                                    <h4 className="text-sm font-bold text-green-400 mt-4 mb-1 px-2 uppercase tracking-wider">{group.category}</h4>
+                                                    <ul className="space-y-1">
+                                                        {group.keywords.map(kw => (
+                                                            keywords[kw] && (
+                                                                <li key={kw}>
+                                                                    <button
+                                                                        onClick={() => handleKeywordClick(kw)}
+                                                                        className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize"
+                                                                    >
+                                                                        {kw}
+                                                                    </button>
+                                                                </li>
+                                                            )
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ))}
+                                            {otherKeywords.length > 0 && (
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-green-400 mt-4 mb-1 px-2 uppercase tracking-wider">Other</h4>
+                                                    <ul className="space-y-1">
+                                                        {otherKeywords.map(kw => (
+                                                            <li key={kw}>
+                                                                <button
+                                                                    onClick={() => handleKeywordClick(kw)}
+                                                                    className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize"
+                                                                >
+                                                                    {kw}
+                                                                </button>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </div>
                         </div>
                     </aside>
                     <KeywordEditorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} keywords={keywords} setKeywords={setKeywords} toast={toast} initialKeyword={editingKeyword} />
