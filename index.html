@@ -19,13 +19,13 @@
         }
         .animate-fadeIn { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
         .animate-fadeOut { animation: fadeOut 0.5s ease-in-out forwards; }
         @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(10px); }
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
         }
         .shadow-glow-Concern { box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), 0 0 5px rgba(239, 68, 68, 0.7); }
         .shadow-glow-Curious { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 0 5px rgba(59, 130, 246, 0.7); }
@@ -33,27 +33,21 @@
         .shadow-glow-Reassuring { box-shadow: 0 0 15px rgba(252, 211, 77, 0.5), 0 0 5px rgba(252, 211, 77, 0.7); }
     </style>
 </head>
-<body class="bg-gray-900">
+<body class="bg-gray-900 text-white">
     <div id="root"></div>
 
     <script type="text/babel">
         // --- React Hooks ---
         const { useState, useEffect, useRef, useCallback } = React;
 
-        // --- MOCK UI COMPONENTS & HOOKS ---
+        // --- UI COMPONENTS & HOOKS ---
         const Toast = ({ message, type, onDismiss }) => {
             const baseStyle = "w-full max-w-sm p-4 rounded-lg shadow-lg text-white transition-all duration-300 transform";
-            const typeStyles = {
-                info: "bg-blue-500",
-                success: "bg-green-500",
-                destructive: "bg-red-500",
-            };
-
+            const typeStyles = { info: "bg-blue-500", success: "bg-green-500", destructive: "bg-red-500" };
             useEffect(() => {
                 const timer = setTimeout(() => onDismiss(), 4000);
                 return () => clearTimeout(timer);
             }, [onDismiss]);
-
             return (
                 <div className={`${baseStyle} ${typeStyles[type] || typeStyles.info}`}>
                     <div className="flex items-center justify-between">
@@ -62,9 +56,7 @@
                             {message.description && <p className="text-sm">{message.description}</p>}
                         </div>
                         <button onClick={onDismiss} className="p-1 rounded-full hover:bg-white/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
                 </div>
@@ -75,92 +67,50 @@
             const [toasts, setToasts] = useState([]);
             const toast = useCallback((message) => {
                 const id = Date.now();
-                const type = message.variant || 'info';
-                setToasts(prev => [...prev, { ...message, id, type }]);
+                setToasts(prev => [...prev, { ...message, id, type: message.variant || 'info' }]);
             }, []);
-
-            const dismissToast = (id) => {
-                setToasts(prev => prev.filter(t => t.id !== id));
-            };
-
+            const dismissToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
             const ToastContainer = () => (
                 <div className="fixed top-4 right-4 z-[100] space-y-2">
-                    {toasts.map(t => (
-                        <Toast key={t.id} message={t} type={t.type} onDismiss={() => dismissToast(t.id)} />
-                    ))}
+                    {toasts.map(t => <Toast key={t.id} message={t} type={t.type} onDismiss={() => dismissToast(t.id)} />)}
                 </div>
             );
-
             return { toast, ToastContainer };
+        };
+        
+        const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, children }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+                    <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-md border border-gray-700">
+                        <div className="p-6">
+                            <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                            <p className="text-gray-300 mb-6">{children}</p>
+                            <div className="flex justify-end gap-3">
+                                <button onClick={onClose} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition-colors">Cancel</button>
+                                <button onClick={onConfirm} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
         // --- INITIAL DATA CONFIGURATION ---
         const INITIAL_KEYWORDS = {
-            fake : {
-                tone: "Thoughtful",
-                category: "Brushoff",
-                content: "Thats a valid concern. What if people just put random information just to see what it shows?\n\nBut when we think about the whole process it takes to complete it...Lets say you saw one of our ads and click on it. You put fake information in the survey just to see what its going to suggest. You completed 40 questions..Now its asking to verify the cell phone number. Would you submit your phone number in internet to get a fake report based on the fake information you submitted?"
-            },
-            reviews: {
-                tone: "Reassuring",
-                category: "Concern",
-                content: "Yeh you are right. I have seen some of those reviews online\n\nWe are not claiming everyone in our platform found success. As I said, its not a silver bullet. But those people who are following our process, we see a booking rate of 30%. It could mean that there are advisors with 10% booking rate and 50% rate. If you take any sample, there are people who find success, and who doesnt. And ofcourse its the people who were not doing their best to reach out to the leads who wont benefit from this. We all make decision based on what others say about it. This is the reason for 3 day trial. So that you can talk to other advisors in our platform and ask them their experience and make an informed decision rather than relying on internet or one person. You can also extend it if you want more time to learn from others who are using the platform and once you are ready, you will start receiving prospects.Again, there are no contracts. So after a month, you can just cancel it."
-            },
-            high : {
-                tone: "Concern",
-                category: "Objection",
-                content: "Yeh. this could be a problem if you have a hard minimum\n\nOur average is $500K. But we will send you households who have more than that amount, and then people who have less. These are usually young professional, like a doctor or software developer for example, with high income, high monthly savings, insurance needs, but low investable assets. Would you take these prospects?\n\nSince you have a high asset requirement, Can I bounce an idea ?\n- There are three ways to increase the chances of getting high net worth clients. First is by increasing the number of leads per month. packages above 50 are meant for this. Another way is that you can choose a zip code that is highly populated and affluent.You can try different zip codes on weekly basis to optimize the averages."
-            },
-            older: {
-                tone: "Reassuring",
-                category: "Concern",
-                content: "Yeh its good that you have a clear demographic in mind\n\nMost of the clients are coming to our platform for retirement planning.And the average over 50 leads will be 425k. Most young proffessionals wont have this much asset So most of them will be above 40-55. . But we will also give you some young professionals, the reason is that eve though their asset would be low. They have high potential, because their income is high. but this will be a minority."
-            },
-            partner: {
-                tone: "Curious",
-                category: "Objection",
-                content: "So you need some time to discuss this with your partner\n\nIn your discussion with your partner what are some obstacle that you see which could be a problem?\n\n- Can I bounce and idea off you\nIts better if you could show them the entire platform on the risk-free trial. This way you can both access everything. We can schedule an onboarding session and I can show the whole process.\nDuring the trial, you or the partner can attend a peer group and hear from people who are using planswell.\nAnd if you or your partner doesnt like it, cancel at any time during the trial. You get complete refund."
-            },
-            compliance: {
-                tone: "Concern",
-                category: "Objection",
-                content: "Yeh I understand your concerns. Compliance could be a major issue\n\nAre you concerned if we would mention you or your company name with clients? or is it something else?\n\n1. we never mention you or your company anywhere.\n2. We don’t make product recommendations in our plans, or recommend any actionable advice.\n3. We only charge a monthly subscription, but never split commissions/have a retainer etc. It’s basically like finding an expensive business card on the side of the road!\n\nOur plan does not give any specific recommendations on investments or products or provide any licensable advice\n\n- Reimbursement - Usually the advisors pay for it.. the reason is that.. with 425k avg, they just need to close one client out of 50 to break even\n- Privacy- What we see is that advisors signup with their personal email address, build relationship with prospects and make it official once they book the meeting."
-            },
-            expensive: {
-                tone: "Curious",
-                category: "Brushoff",
-                content: "Definitely the price should make sense to you\n\nIts expensive compared to other solutions or you dont think the outcome will justify the cost?\n\nApart from the cost, is there something else thats giving you a pause?\n\nSo you dont see the ROI?"
-            },
-            ready: {
-                tone: "Concern",
-                category: "Objection",
-                content: "Yeh. Capacity is really important. If you dont have the time to reach out, these leads will go cold.\n\nApart from timing, is there any other issues thats giving you pause?\n\nIf you are serious about our program Can I bounce an Idea off you?\nI mentioned about trial period.Instead of 3 daysI I can extend it for X weeks. \nWe currently have some promotions going on and this is based on states. Since XX is Green/Orange state now you get 10-15%.And this applied to every month. But if you join after YY Weeks/Months and the capacity of state is low the discount will also change. You can lock the spot with discount.\nAnd if you change your mind during the trial period, you can cancel and you get complete refund.\nWe will part ways and someone else take the spot.\n\nHow does that sound? It takes only 2-3 mins"
-            },
-            time: {
-                tone: "Reassuring",
-                category: "Brushoff",
-                content: "Definitely, Its.....Something new and you need to think about it\n\nBut to understand your situation, is it because of capacity issues , do you want to do some research or you just need to sleep on it?\n\n\nSure (Name) - Take your time. Lets schedule a follow up call tomorrow... let me check my Calendar\n\nI have a slot available tomorrow 3PM EST. Is that okay for you?\n\n-Just to make sure I could share you some relevant information. What were the things that were causing you the most concern?.. So that we can focus our next conversation on that."
-            },
-            zip: {
-                tone: "Reassuring",
-                category: "Concern",
-                content: "Sorry that I didnt mention about it.\n\nWhen you signup, you will submit a zip code and we try to get you leads within than zip code. But if we cannot find high quality leads we will expand it, but it will be all within the state\n\nBut we focus more on quality than proximity. Lets say thre is a prospect with 80k investable asset within 20 miles and someone with $600k within the state but an hour apart. We will deliver the $600k if this ensures the average value of $500k we promised.\n\nDoes that makes sense for you?\nIs it because you prefer face to face meeting?\nIn person meeting are great. However, remember how we are actually finding these people in the first place. They are coming to us through an online questionnaire. They have very little resistance to zoom calls, phone calls etc - it’s actually preferred for them. Would you turn down someone with $500K in assets just because the client prefers zoom calls?"
-            },
-            research: {
-                tone: "Reassuring",
-                category: "Brushoff",
-                content: "Yeh ofcourse. You should do your due diligence before making a decision\n\nWhat are some aspect of our program that you are skeptical about?\n\nCan I bounce an Idea off you?\n\nResearch - You can either look it up on Google or find someone who’s using Planswell, or just chat with a bunch of users during one of our meetup sessions\nAs I mentioned, we have meetup sessions called Plancraft on every Wednesdays and Thursdays..\nyou can interact with other advisors and agents and see how it is working for them.\nYou can expect 30-40 people in a session. And they talk about industry, success stories, best practices.. things like that\n\nYou can hop in and raise a hand ask them some questions. !! And see how is working for them.\nThis could help you to make that *informed decision*. It is available during the trial\n\nSo you can signup for a trial \nand extend it to a week. \n\nDuring the week talk to others and go through the resources.  And if you dont like it, just cancel and you get complete refund.\n\nYou are definitley gonna impressed by that...in that case you get to keep your spot and we will start sending you leads..\n\nHow does that sound?"
-            },
-            quality: {
-                tone: "Curious",
-                category: "Concern",
-                content: "Yeh. Quality of lead is important.\n\nAre you concerned that the leads might be cold or that people might submit incorrect information"
-            },
-            cold : {
-                tone: "Reassuring",
-                category: "Concern",
-                content: "Yeh. The client should have some pain points. Otherwise its a cold leads\n\nThese are not cold leads, there is a reason why they take the effort to go through all the process and verify their phone numbers. And when they see the plan that we generate, it doesnt show any actionable advice. So there is still a pain and if you could call them within a day or two, they still remember. Its not Hot leads because they dont know you, but they are warm... If you dont call them within a week, they may forget and become cold\n\nSo if you follow our script, call within a day or two you have more chances of seeing 30% booking rate"
-            },
+            fake: { tone: "Thoughtful", category: "Brushoff", content: "Thats a valid concern. What if people just put random information just to see what it shows?\n\nBut when we think about the whole process it takes to complete it...Lets say you saw one of our ads and click on it. You put fake information in the survey just to see what its going to suggest. You completed 40 questions..Now its asking to verify the cell phone number. Would you submit your phone number in internet to get a fake report based on the fake information you submitted?" },
+            reviews: { tone: "Reassuring", category: "Concern", content: "Yeh you are right. I have seen some of those reviews online\n\nWe are not claiming everyone in our platform found success. As I said, its not a silver bullet. But those people who are following our process, we see a booking rate of 30%. It could mean that there are advisors with 10% booking rate and 50% rate. If you take any sample, there are people who find success, and who doesnt. And ofcourse its the people who were not doing their best to reach out to the leads who wont benefit from this. We all make decision based on what others say about it. This is the reason for 3 day trial. So that you can talk to other advisors in our platform and ask them their experience and make an informed decision rather than relying on internet or one person. You can also extend it if you want more time to learn from others who are using the platform and once you are ready, you will start receiving prospects.Again, there are no contracts. So after a month, you can just cancel it." },
+            high: { tone: "Concern", category: "Objection", content: "Yeh. this could be a problem if you have a hard minimum\n\nOur average is $500K. But we will send you households who have more than that amount, and then people who have less. These are usually young professional, like a doctor or software developer for example, with high income, high monthly savings, insurance needs, but low investable assets. Would you take these prospects?\n\nSince you have a high asset requirement, Can I bounce an idea ?\n- There are three ways to increase the chances of getting high net worth clients. First is by increasing the number of leads per month. packages above 50 are meant for this. Another way is that you can choose a zip code that is highly populated and affluent.You can try different zip codes on weekly basis to optimize the averages." },
+            older: { tone: "Reassuring", category: "Concern", content: "Yeh its good that you have a clear demographic in mind\n\nMost of the clients are coming to our platform for retirement planning.And the average over 50 leads will be 425k. Most young proffessionals wont have this much asset So most of them will be above 40-55. . But we will also give you some young professionals, the reason is that eve though their asset would be low. They have high potential, because their income is high. but this will be a minority." },
+            partner: { tone: "Curious", category: "Objection", content: "So you need some time to discuss this with your partner\n\nIn your discussion with your partner what are some obstacle that you see which could be a problem?\n\n- Can I bounce and idea off you\nIts better if you could show them the entire platform on the risk-free trial. This way you can both access everything. We can schedule an onboarding session and I can show the whole process.\nDuring the trial, you or the partner can attend a peer group and hear from people who are using planswell.\nAnd if you or your partner doesnt like it, cancel at any time during the trial. You get complete refund." },
+            compliance: { tone: "Concern", category: "Objection", content: "Yeh I understand your concerns. Compliance could be a major issue\n\nAre you concerned if we would mention you or your company name with clients? or is it something else?\n\n1. we never mention you or your company anywhere.\n2. We don’t make product recommendations in our plans, or recommend any actionable advice.\n3. We only charge a monthly subscription, but never split commissions/have a retainer etc. It’s basically like finding an expensive business card on the side of the road!\n\nOur plan does not give any specific recommendations on investments or products or provide any licensable advice\n\n- Reimbursement - Usually the advisors pay for it.. the reason is that.. with 425k avg, they just need to close one client out of 50 to break even\n- Privacy- What we see is that advisors signup with their personal email address, build relationship with prospects and make it official once they book the meeting." },
+            expensive: { tone: "Curious", category: "Brushoff", content: "Definitely the price should make sense to you\n\nIts expensive compared to other solutions or you dont think the outcome will justify the cost?\n\nApart from the cost, is there something else thats giving you a pause?\n\nSo you dont see the ROI?" },
+            ready: { tone: "Concern", category: "Objection", content: "Yeh. Capacity is really important. If you dont have the time to reach out, these leads will go cold.\n\nApart from timing, is there any other issues thats giving you a pause?\n\nIf you are serious about our program Can I bounce an Idea off you?\nI mentioned about trial period.Instead of 3 daysI I can extend it for X weeks. \nWe currently have some promotions going on and this is based on states. Since XX is Green/Orange state now you get 10-15%.And this applied to every month. But if you join after YY Weeks/Months and the capacity of state is low the discount will also change. You can lock the spot with discount.\nAnd if you change your mind during the trial period, you can cancel and you get complete refund.\nWe will part ways and someone else take the spot.\n\nHow does that sound? It takes only 2-3 mins" },
+            time: { tone: "Reassuring", category: "Brushoff", content: "Definitely, Its.....Something new and you need to think about it\n\nBut to understand your situation, is it because of capacity issues , do you want to do some research or you just need to sleep on it?\n\n\nSure (Name) - Take your time. Lets schedule a follow up call tomorrow... let me check my Calendar\n\nI have a slot available tomorrow 3PM EST. Is that okay for you?\n\n-Just to make sure I could share you some relevant information. What were the things that were causing you the most concern?.. So that we can focus our next conversation on that." },
+            zip: { tone: "Reassuring", category: "Concern", content: "Sorry that I didnt mention about it.\n\nWhen you signup, you will submit a zip code and we try to get you leads within than zip code. But if we cannot find high quality leads we will expand it, but it will be all within the state\n\nBut we focus more on quality than proximity. Lets say thre is a prospect with 80k investable asset within 20 miles and someone with $600k within the state but an hour apart. We will deliver the $600k if this ensures the average value of $500k we promised.\n\nDoes that makes sense for you?\nIs it because you prefer face to face meeting?\nIn person meeting are great. However, remember how we are actually finding these people in the first place. They are coming to us through an online questionnaire. They have very little resistance to zoom calls, phone calls etc - it’s actually preferred for them. Would you turn down someone with $500K in assets just because the client prefers zoom calls?" },
+            research: { tone: "Reassuring", category: "Brushoff", content: "Yeh ofcourse. You should do your due diligence before making a decision\n\nWhat are some aspect of our program that you are skeptical about?\n\nCan I bounce an Idea off you?\n\nResearch - You can either look it up on Google or find someone who’s using Planswell, or just chat with a bunch of users during one of our meetup sessions\nAs I mentioned, we have meetup sessions called Plancraft on every Wednesdays and Thursdays..\nyou can interact with other advisors and agents and see how it is working for them.\nYou can expect 30-40 people in a session. And they talk about industry, success stories, best practices.. things like that\n\nYou can hop in and raise a hand ask them some questions. !! And see how is working for them.\nThis could help you to make that *informed decision*. It is available during the trial\n\nSo you can signup for a trial \nand extend it to a week. \n\nDuring the week talk to others and go through the resources.  And if you dont like it, just cancel and you get complete refund.\n\nYou are definitley gonna impressed by that...in that case you get to keep your spot and we will start sending you leads..\n\nHow does that sound?" },
+            quality: { tone: "Curious", category: "Concern", content: "Yeh. Quality of lead is important.\n\nAre you concerned that the leads might be cold or that people might submit incorrect information" },
+            cold: { tone: "Reassuring", category: "Concern", content: "Yeh. The client should have some pain points. Otherwise its a cold leads\n\nThese are not cold leads, there is a reason why they take the effort to go through all the process and verify their phone numbers. And when they see the plan that we generate, it doesnt show any actionable advice. So there is still a pain and if you could call them within a day or two, they still remember. Its not Hot leads because they dont know you, but they are warm... If you dont call them within a week, they may forget and become cold\n\nSo if you follow our script, call within a day or two you have more chances of seeing 30% booking rate" },
             consent: { tone: "Concern", category: "Concerns", content: "Please add your response for 'consent' here." },
             'Setup fee': { tone: "Concern", category: "Objections", content: "Please add your response here." },
             'DNC': { tone: "Concern", category: "Concerns", content: "Please add your response here." },
@@ -170,14 +120,15 @@
             'upfront': { tone: "Concern", category: "Objections", content: "Please add your response here." },
             'appointments': { tone: "Curious", category: "Concerns", content: "Please add your response for 'need appointments' here." },
         };
-
+        
         // --- Keyword Editor Modal Component ---
-        const KeywordEditorModal = ({ isOpen, onClose, keywords, setKeywords, toast, initialKeyword }) => {
+        const KeywordEditorModal = ({ isOpen, onClose, keywords, onSaveKeywords, toast, initialKeyword }) => {
             const [originalKeyword, setOriginalKeyword] = useState(null);
             const [currentKeyword, setCurrentKeyword] = useState('');
             const [currentTone, setCurrentTone] = useState('Curious');
             const [currentCategory, setCurrentCategory] = useState('Brushoff');
             const [currentContent, setCurrentContent] = useState('');
+            const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
             useEffect(() => {
                 if (isOpen && initialKeyword) {
@@ -189,7 +140,7 @@
                         setCurrentCategory(kwData.category || 'Brushoff');
                         setCurrentContent(kwData.content || '');
                     }
-                } else if (isOpen) { // For adding a new keyword
+                } else if (isOpen) {
                     setOriginalKeyword(null);
                     setCurrentKeyword('');
                     setCurrentTone('Curious');
@@ -209,72 +160,241 @@
                     delete newKeywords[originalKeyword];
                 }
                 newKeywords[newKeywordKey] = { tone: currentTone, category: currentCategory, content: currentContent };
-                setKeywords(newKeywords);
+                onSaveKeywords(newKeywords);
                 toast({ title: "Success", description: `Keyword '${newKeywordKey}' saved.`, variant: "success" });
                 onClose();
             };
 
-            const handleDelete = (e, keywordToDelete) => {
+            const handleDelete = () => {
+                const newKeywords = { ...keywords };
+                delete newKeywords[originalKeyword];
+                onSaveKeywords(newKeywords);
+                toast({ title: "Deleted", description: `Keyword '${originalKeyword}' removed.`, variant: "info" });
+                setIsConfirmDeleteOpen(false);
+                onClose();
+            };
+            
+            const openConfirmModal = (e) => {
                 e.stopPropagation();
-                if (window.confirm(`Are you sure you want to delete the keyword "${keywordToDelete}"?`)) {
-                    const newKeywords = { ...keywords };
-                    delete newKeywords[keywordToDelete];
-                    setKeywords(newKeywords);
-                    toast({ title: "Deleted", description: `Keyword '${keywordToDelete}' removed.`, variant: "info" });
-                    onClose();
-                }
+                if (originalKeyword) setIsConfirmDeleteOpen(true);
             };
 
             if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg flex flex-col border border-gray-700 max-h-[90vh]">
-                        <header className="p-4 border-b border-gray-700 flex justify-between items-center flex-shrink-0">
-                            <h2 className="text-xl font-bold text-white">{originalKeyword ? `Editing '${originalKeyword}'` : 'Add New Keyword'}</h2>
-                            <button onClick={onClose} className="text-gray-400 hover:text-white">&times;</button>
-                        </header>
-                        <div className="p-6 space-y-4 overflow-y-auto">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Keyword</label>
-                                <input type="text" value={currentKeyword} onChange={e => setCurrentKeyword(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Tone</label>
-                                <select value={currentTone} onChange={e => setCurrentTone(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Concern">Concern</option>
-                                    <option value="Curious">Curious</option>
-                                    <option value="Thoughtful">Thoughtful</option>
-                                    <option value="Reassuring">Reassuring</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
-                                <select value={currentCategory} onChange={e => setCurrentCategory(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Brushoff">Brushoff</option>
-                                    <option value="Concerns">Concerns</option>
-                                    <option value="Objections">Objections</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Response Content</label>
-                                <textarea value={currentContent} onChange={e => setCurrentContent(e.target.value)} rows="8" className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style={{whiteSpace: 'pre-wrap'}}></textarea>
-                            </div>
-                            <div className="flex justify-between items-center pt-2">
-                                <button onClick={(e) => handleDelete(e, originalKeyword)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors disabled:opacity-50" disabled={!originalKeyword}>Delete</button>
-                                <div className="flex gap-2">
-                                    <button onClick={onClose} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition-colors">Cancel</button>
-                                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition-colors">Save</button>
+                <>
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg flex flex-col border border-gray-700 max-h-[90vh]">
+                            <header className="p-4 border-b border-gray-700 flex justify-between items-center flex-shrink-0">
+                                <h2 className="text-xl font-bold text-white">{originalKeyword ? `Editing '${originalKeyword}'` : 'Add New Keyword'}</h2>
+                                <button onClick={onClose} className="text-gray-400 hover:text-white">&times;</button>
+                            </header>
+                            <div className="p-6 space-y-4 overflow-y-auto">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Keyword</label>
+                                    <input type="text" value={currentKeyword} onChange={e => setCurrentKeyword(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Tone</label>
+                                    <select value={currentTone} onChange={e => setCurrentTone(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="Concern">Concern</option>
+                                        <option value="Curious">Curious</option>
+                                        <option value="Thoughtful">Thoughtful</option>
+                                        <option value="Reassuring">Reassuring</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
+                                    <select value={currentCategory} onChange={e => setCurrentCategory(e.target.value)} className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="Brushoff">Brushoff</option>
+                                        <option value="Concerns">Concerns</option>
+                                        <option value="Objections">Objections</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Response Content</label>
+                                    <textarea value={currentContent} onChange={e => setCurrentContent(e.target.value)} rows="8" className="w-full bg-gray-700 border border-gray-500 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style={{whiteSpace: 'pre-wrap'}}></textarea>
+                                </div>
+                                <div className="flex justify-between items-center pt-2">
+                                    <button onClick={openConfirmModal} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors disabled:opacity-50" disabled={!originalKeyword}>Delete</button>
+                                    <div className="flex gap-2">
+                                        <button onClick={onClose} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition-colors">Cancel</button>
+                                        <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded transition-colors">Save</button>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <ConfirmationModal isOpen={isConfirmDeleteOpen} onClose={() => setIsConfirmDeleteOpen(false)} onConfirm={handleDelete} title="Confirm Deletion">
+                        Are you sure you want to delete the keyword "{originalKeyword}"? This action cannot be undone.
+                    </ConfirmationModal>
+                </>
+            );
+        };
+
+        // --- NEW: Response Card Modal ---
+        const ResponseCardModal = ({ isOpen, onClose, onBack, onKeywordClick, responseKeyword, keywords, historyLength }) => {
+            if (!isOpen) return null;
+
+            const responseData = keywords[responseKeyword];
+            if (!responseData) return null;
+
+            const toneClasses = {
+                Concern: { border: 'border-red-500', text: 'text-red-400', shadow: 'shadow-glow-Concern' },
+                Curious: { border: 'border-blue-500', text: 'text-blue-400', shadow: 'shadow-glow-Curious' },
+                Thoughtful: { border: 'border-green-500', text: 'text-green-400', shadow: 'shadow-glow-Thoughtful' },
+                Reassuring: { border: 'border-yellow-400', text: 'text-yellow-300', shadow: 'shadow-glow-Reassuring' }
+            };
+            const currentToneClasses = toneClasses[responseData.tone] || toneClasses.Curious;
+
+            const renderContentWithClickableKeywords = (content) => {
+                if (!keywords) return content;
+                const allKeywords = Object.keys(keywords).sort((a, b) => b.length - a.length);
+                const regex = new RegExp(`(${allKeywords.join('|')})`, 'gi');
+                const parts = content.split(regex);
+                
+                return parts.map((part, index) => {
+                    const lowerPart = part.toLowerCase();
+                    if (allKeywords.includes(lowerPart)) {
+                        return (
+                            <span key={index} className="text-blue-400 underline cursor-pointer hover:text-blue-300" onClick={() => onKeywordClick(lowerPart)}>
+                                {part}
+                            </span>
+                        );
+                    }
+                    return <span key={index}>{part}</span>;
+                });
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+                    <div className={`border ${currentToneClasses.border} ${currentToneClasses.shadow} w-full max-w-4xl bg-gray-800 rounded-lg p-6`}>
+                        <div className="flex items-start justify-between mb-2 gap-4">
+                            {historyLength > 1 ? (
+                                <button onClick={onBack} title="Go Back" className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                </button>
+                            ) : <div className="w-7 h-7"></div>}
+                            
+                            <div className="flex-grow">
+                                <h3 className="text-2xl font-bold capitalize text-white text-center">{responseKeyword}</h3>
+                                <p className={`text-sm font-medium ${currentToneClasses.text} text-center`}>{responseData.tone}</p>
+                            </div>
+
+                            <div className="flex items-center flex-shrink-0 gap-4">
+                                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-700 px-2 py-1 rounded">{responseData.category}</span>
+                                <button onClick={onClose} title="Close" className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                            </div>
+                        </div>
+                        <div className="max-h-[60vh] overflow-y-auto mt-4 pr-2">
+                            <p className="text-gray-300 leading-relaxed" style={{whiteSpace: 'pre-wrap'}}>
+                                {renderContentWithClickableKeywords(responseData.content)}
+                            </p>
                         </div>
                     </div>
                 </div>
             );
         };
+        
+        // --- NEW: Script Editor Component ---
+        const ScriptEditor = ({ initialScript, onSave }) => {
+            const [isEditing, setIsEditing] = useState(false);
+            const [script, setScript] = useState(initialScript);
+            const textareaRef = useRef(null);
+
+            useEffect(() => {
+                setScript(initialScript);
+            }, [initialScript]);
+
+            useEffect(() => {
+                if (isEditing && textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                    textareaRef.current.focus();
+                }
+            }, [isEditing]);
+
+            const handleTextareaChange = (e) => {
+                setScript(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = `${e.target.scrollHeight}px`;
+            };
+
+            const handleSave = () => {
+                setIsEditing(false);
+                onSave(script);
+            };
+
+            const renderScriptContent = (text) => {
+                const lines = text.split('\n');
+                const elements = [];
+                let listItems = [];
+
+                const flushList = () => {
+                    if (listItems.length > 0) {
+                        elements.push(
+                            <ul key={`ul-${elements.length}`} className="list-disc list-inside space-y-1 my-2 pl-4">
+                                {listItems.map((item, index) => <li key={index} style={{ whiteSpace: 'pre-wrap' }}>{item}</li>)}
+                            </ul>
+                        );
+                        listItems = [];
+                    }
+                };
+
+                lines.forEach((line, index) => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.startsWith('- ')) {
+                        listItems.push(line.substring(line.indexOf('- ') + 2));
+                    } else {
+                        flushList();
+                        if (trimmedLine.startsWith('### ')) {
+                            elements.push(<h3 key={index} className="text-lg font-semibold mt-2 mb-1 text-gray-200" style={{ whiteSpace: 'pre-wrap' }}>{line.substring(line.indexOf('### ') + 4)}</h3>);
+                        } else if (trimmedLine.startsWith('## ')) {
+                            elements.push(<h2 key={index} className="text-xl font-bold mt-3 mb-1 text-gray-100" style={{ whiteSpace: 'pre-wrap' }}>{line.substring(line.indexOf('## ') + 3)}</h2>);
+                        } else if (trimmedLine.startsWith('# ')) {
+                            elements.push(<h1 key={index} className="text-2xl font-bold mt-4 mb-2 text-gray-50 border-b border-gray-600 pb-1" style={{ whiteSpace: 'pre-wrap' }}>{line.substring(line.indexOf('# ') + 2)}</h1>);
+                        } else {
+                            elements.push(<p key={index} className="text-gray-300 my-1" style={{ whiteSpace: 'pre-wrap' }}>{line || '\u00A0'}</p>);
+                        }
+                    }
+                });
+                
+                flushList();
+                
+                return elements;
+            };
+
+            return (
+                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 max-w-4xl mx-auto">
+                    <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-bold text-gray-300 text-sm">Script</h4>
+                        {isEditing ? (
+                            <button onClick={handleSave} className="text-xs bg-green-600 hover:bg-green-500 px-2 py-1 rounded">Save</button>
+                         ) : (
+                            <button onClick={() => setIsEditing(true)} className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded">Edit</button>
+                         )}
+                    </div>
+                    {isEditing ? (
+                        <textarea
+                            ref={textareaRef}
+                            className="w-full bg-gray-900 rounded p-2 text-gray-300 whitespace-pre-wrap focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-hidden"
+                            value={script}
+                            onChange={handleTextareaChange}
+                            placeholder="Enter your script here. Use #, ##, ###, and - for formatting."
+                        />
+                    ) : (
+                        <div className="min-h-[5rem] p-2 rounded prose prose-invert max-w-none" onClick={() => setIsEditing(true)}>
+                            {script ? renderScriptContent(script) : <p className="text-gray-500">Click to edit script...</p>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
 
         // --- MAIN APPLICATION COMPONENT ---
         const App = () => {
+            // App State
             const [view, setView] = useState('main');
             const [isListening, setIsListening] = useState(false);
             const [detectedKeywords, setDetectedKeywords] = useState([]);
@@ -285,62 +405,60 @@
             const [editingKeyword, setEditingKeyword] = useState(null);
             const [isSidebarOpen, setIsSidebarOpen] = useState(false);
             const [bottomNotification, setBottomNotification] = useState('');
-
+            
             const [keywords, setKeywords] = useState(() => {
                 try {
-                    const savedKeywords = localStorage.getItem('voiceKeywordAppKeywords');
-                    return savedKeywords ? JSON.parse(savedKeywords) : INITIAL_KEYWORDS;
-                } catch (error) {
-                    console.error("Error reading keywords from localStorage", error);
+                    const saved = localStorage.getItem('voiceKeywordAppKeywords');
+                    return saved ? JSON.parse(saved) : INITIAL_KEYWORDS;
+                } catch (e) {
                     return INITIAL_KEYWORDS;
                 }
             });
 
-            useEffect(() => {
-                try {
-                    localStorage.setItem('voiceKeywordAppKeywords', JSON.stringify(keywords));
-                } catch (error) {
-                    console.error("Error saving keywords to localStorage", error);
-                }
-            }, [keywords]);
+            const [scriptText, setScriptText] = useState(() => {
+                return localStorage.getItem('voiceKeywordAppScript') || '';
+            });
 
             const recognitionRef = useRef(null);
-            const transcriptRef = useRef('');
             const isListeningRef = useRef(false);
             const { toast, ToastContainer } = useToast();
+
+            // --- Data Save Functions ---
+            const handleSaveKeywords = (newKeywords) => {
+                setKeywords(newKeywords);
+                localStorage.setItem('voiceKeywordAppKeywords', JSON.stringify(newKeywords));
+            };
             
-            useEffect(() => {
-                isListeningRef.current = isListening;
-            }, [isListening]);
+            const handleSaveScript = (newScript) => {
+                setScriptText(newScript);
+                localStorage.setItem('voiceKeywordAppScript', newScript);
+                toast({ title: "Success", description: "Script saved.", variant: "success" });
+            };
+            
+            // --- Other useEffects and Callbacks ---
+            useEffect(() => { isListeningRef.current = isListening; }, [isListening]);
             
             useEffect(() => {
                 if (bottomNotification) {
-                    const timer = setTimeout(() => {
-                        setBottomNotification('');
-                    }, 3000); // Clear after 3 seconds
+                    const timer = setTimeout(() => setBottomNotification(''), 3000);
                     return () => clearTimeout(timer);
                 }
             }, [bottomNotification]);
             
             useEffect(() => {
-                if (isModalOpen) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = 'unset';
-                }
-                return () => {
-                    document.body.style.overflow = 'unset';
-                };
-            }, [isModalOpen]);
+                document.body.style.overflow = (isModalOpen || activeKeywordResponse) ? 'hidden' : 'unset';
+                return () => { document.body.style.overflow = 'unset'; };
+            }, [isModalOpen, activeKeywordResponse]);
 
             const detectKeywords = useCallback((text) => {
+                if (!keywords) return;
                 const lowerCaseText = text.toLowerCase();
                 const newKeywords = [];
                 let detectedResponseKeyword = null;
                 const availableKeywords = Object.keys(keywords).sort((a, b) => b.length - a.length);
 
                 availableKeywords.forEach(keyword => {
-                    if (lowerCaseText.includes(keyword)) {
+                    if (lowerCaseText.includes(keyword.toLowerCase())) {
                         newKeywords.push({ id: `${keyword}-${Date.now()}`, word: keyword, timestamp: new Date() });
                         if (keywords[keyword] && !detectedResponseKeyword) {
                             detectedResponseKeyword = keyword;
@@ -349,7 +467,7 @@
                 });
 
                 if (newKeywords.length > 0) {
-                    setDetectedKeywords(prev => [...newKeywords, ...prev].slice(0, 3));
+                    setDetectedKeywords(prev => [...newKeywords, ...prev].slice(0, 5));
                     if (detectedResponseKeyword) {
                         handleKeywordClick(detectedResponseKeyword);
                     } else {
@@ -374,43 +492,24 @@
                 }
                 
                 const recognition = recognitionRef.current;
-
-                const handleResult = (event) => {
+                const handleResult = (event) => { 
                     let finalTranscript = '';
-                    let interimTranscript = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcriptSegment = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) finalTranscript += transcriptSegment;
-                        else interimTranscript += transcriptSegment;
+                        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + ' ';
                     }
-                    const fullTranscript = transcriptRef.current + finalTranscript;
-                    transcriptRef.current = fullTranscript;
-                    if (finalTranscript) {
-                        detectKeywords(finalTranscript);
-                    }
+                    if (finalTranscript) detectKeywords(finalTranscript);
                 };
-
-                const handleError = (event) => {
-                    console.error('Speech recognition error:', event.error, event.message);
-                    if (event.error === 'no-speech' || event.error === 'network') {
-                        // Non-critical errors, we'll let the onend handler restart recognition.
-                        // No need to show a toast, as it should be a seamless restart.
-                    } else {
+                const handleError = (event) => { 
+                    if (event.error !== 'no-speech' && event.error !== 'network') {
                         toast({ title: "Speech Error", description: `Error: ${event.error}. Mic is off.`, variant: "destructive" });
-                        setIsListening(false); // Stop for other critical errors
+                        setIsListening(false);
                     }
                 };
-                
-                const handleEnd = () => {
+                const handleEnd = () => {  
                     if (isListeningRef.current) {
                         setTimeout(() => {
                             if (isListeningRef.current) {
-                                try {
-                                    recognition.start();
-                                } catch (e) {
-                                    console.error("Error restarting recognition:", e);
-                                    setIsListening(false);
-                                }
+                                try { recognition.start(); } catch (e) { setIsListening(false); }
                             }
                         }, 250);
                     } else {
@@ -429,10 +528,9 @@
                 };
             }, [detectKeywords, toast]);
 
-            const startListening = () => {
+            const startListening = () => { 
                 if (!isSupported || !recognitionRef.current || isListening) return;
                 try {
-                    transcriptRef.current = '';
                     setDetectedKeywords([]);
                     setActiveKeywordResponse(null);
                     setResponseHistory([]);
@@ -440,95 +538,47 @@
                     recognitionRef.current.start();
                     setBottomNotification("Listening started...");
                 } catch (error) {
-                    console.error('Error starting recognition:', error);
                     setIsListening(false);
                     toast({ title: "Error", description: "Failed to start listening.", variant: "destructive" });
                 }
             };
-
-            const stopListening = () => {
+            const stopListening = () => { 
                 if (recognitionRef.current && isListening) {
                     setIsListening(false);
                     recognitionRef.current.stop();
                     setBottomNotification("Listening stopped.");
                 }
             };
-            
-            const handleKeywordClick = (keyword) => {
+            const handleKeywordClick = (keyword) => { 
                 setActiveKeywordResponse(keyword);
-                setResponseHistory(prev => {
-                    if (prev[prev.length - 1] !== keyword) {
-                        return [...prev, keyword];
-                    }
-                    return prev;
-                });
+                setResponseHistory(prev => (prev[prev.length - 1] !== keyword) ? [...prev, keyword] : prev);
                 setBottomNotification(`'${keyword}' response available`);
             };
-
-            const handleGoBack = () => {
+            const handleGoBack = () => { 
                 setResponseHistory(prev => {
                     const newHistory = [...prev];
                     newHistory.pop();
-                    const previousResponse = newHistory[newHistory.length - 1] || null;
-                    setActiveKeywordResponse(previousResponse);
+                    setActiveKeywordResponse(newHistory[newHistory.length - 1] || null);
                     return newHistory;
                 });
             };
-            
-            const closeResponseCard = () => {
+            const closeResponseCard = () => { 
                 setActiveKeywordResponse(null);
                 setResponseHistory([]);
-            }
-            
-            const openEditor = (keyword = null) => {
+            };
+            const openEditor = (keyword = null) => { 
                 setEditingKeyword(keyword);
                 setIsModalOpen(true);
             };
-
-            const renderContentWithClickableKeywords = (content) => {
-                const allKeywords = Object.keys(keywords).sort((a, b) => b.length - a.length);
-                const regex = new RegExp(`(${allKeywords.join('|')})`, 'gi');
-                const parts = content.split(regex);
-                
-                return parts.map((part, index) => {
-                    const lowerPart = part.toLowerCase();
-                    if (allKeywords.includes(lowerPart)) {
-                        return (
-                            <span 
-                                key={index} 
-                                className="text-blue-400 underline cursor-pointer hover:text-blue-300"
-                                onClick={() => handleKeywordClick(lowerPart)}
-                            >
-                                {part}
-                            </span>
-                        );
-                    }
-                    return <span key={index}>{part}</span>;
-                });
-            };
             
+            // --- Render Views ---
             const MainView = () => {
-                const activeResponseData = activeKeywordResponse ? keywords[activeKeywordResponse] : null;
-                const toneClasses = {
-                    Concern: { border: 'border-red-500', text: 'text-red-400', shadow: 'shadow-glow-Concern' },
-                    Curious: { border: 'border-blue-500', text: 'text-blue-400', shadow: 'shadow-glow-Curious' },
-                    Thoughtful: { border: 'border-green-500', text: 'text-green-400', shadow: 'shadow-glow-Thoughtful' },
-                    Reassuring: { border: 'border-yellow-400', text: 'text-yellow-300', shadow: 'shadow-glow-Reassuring' }
-                };
-                const currentToneClasses = activeResponseData ? (toneClasses[activeResponseData.tone] || toneClasses.Curious) : toneClasses.Curious;
-
                 return (
                     <div className="p-4 sm:p-6 lg:p-8">
-                        <header className="flex justify-between items-start mb-8">
+                        <header className="flex justify-between items-start mb-6">
                             <div className="flex items-center gap-4">
-                                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                                </button>
-                                <button onClick={() => setView('deck')} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                    </svg>
-                                </button>
+                                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                                <button onClick={() => setView('deck')} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></button>
                             </div>
                             <div className="flex flex-col items-center space-y-2 flex-shrink-0 ml-4">
                                 <button onClick={isListening ? stopListening : startListening} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50 ${isListening ? 'bg-red-600 hover:bg-red-700 animate-pulse-listening focus:ring-red-400' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400'}`} disabled={!isSupported}>
@@ -537,51 +587,16 @@
                                 <span className="text-sm text-gray-400">{isListening ? 'Listening...' : 'Start'}</span>
                             </div>
                         </header>
-                        <main className="space-y-8 pb-16">
-                            <div className="flex flex-col items-center justify-center min-h-[30vh]">
-                                {activeResponseData ? (
-                                    <div className={`animate-fadeIn border ${currentToneClasses.border} ${currentToneClasses.shadow} w-full max-w-4xl bg-gray-800/50 rounded-lg p-6`}>
-                                        <div className="flex items-start justify-between mb-2 gap-4">
-                                            {responseHistory.length > 1 ? (
-                                                 <button onClick={handleGoBack} title="Go Back" className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                                    </svg>
-                                                </button>
-                                            ) : <div className="w-7 h-7"></div> }
-                                            
-                                            <div className="flex-grow">
-                                                 <h3 className="text-2xl font-bold capitalize text-white text-center">{activeKeywordResponse}</h3>
-                                                 <p className={`text-sm font-medium ${currentToneClasses.text} text-center`}>{activeResponseData.tone}</p>
-                                            </div>
+                        <main className="space-y-6 pb-16">
+                            <ScriptEditor initialScript={scriptText} onSave={handleSaveScript} />
 
-                                            <div className="flex items-center flex-shrink-0 gap-4">
-                                                 <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-700 px-2 py-1 rounded">{activeResponseData.category}</span>
-                                                <button onClick={closeResponseCard} title="Close" className="text-gray-400 hover:text-white">&times;</button>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-300 leading-relaxed mt-4" style={{whiteSpace: 'pre-wrap'}}>
-                                            {renderContentWithClickableKeywords(activeResponseData.content)}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="text-center">
-                                        <h2 className="text-2xl font-semibold text-gray-500">{isListening ? "Listening for keywords..." : "Ready to start"}</h2>
-                                        <p className="text-gray-400 mt-2">{isListening ? "Speak now." : "Click the microphone button to begin."}</p>
-                                    </div>
-                                )}
-                            </div>
                             {detectedKeywords.length > 0 && (
                                 <div className="fixed bottom-0 left-0 right-0 w-full p-4 bg-gray-900/80 backdrop-blur-sm border-t border-gray-700">
                                     <div className="max-w-5xl mx-auto">
                                         <h4 className="font-bold text-gray-300 mb-2 text-sm">Detected Keywords</h4>
                                         <div className="flex gap-2 pb-2 overflow-x-auto">
                                             {detectedKeywords.map((kw) => (
-                                                <button
-                                                    key={kw.id}
-                                                    onClick={() => handleKeywordClick(kw.word)}
-                                                    className="flex-shrink-0 flex items-center justify-between gap-2 bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs hover:bg-blue-500/40 transition-colors cursor-pointer"
-                                                >
+                                                <button key={kw.id} onClick={() => handleKeywordClick(kw.word)} className="flex-shrink-0 flex items-center justify-between gap-2 bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs hover:bg-blue-500/40 transition-colors cursor-pointer">
                                                     <span className="font-medium">{kw.word}</span>
                                                     <span className="text-blue-400/70">{kw.timestamp.toLocaleTimeString()}</span>
                                                 </button>
@@ -646,9 +661,9 @@
                     </div>
                 );
             };
-
-            return (
-                <div className={`relative min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'pl-64' : 'pl-0'}`}>
+            
+            const Sidebar = () => {
+                return (
                     <aside className={`fixed top-0 left-0 z-40 w-64 h-full bg-gray-800 p-4 transition-transform duration-300 ease-in-out overflow-y-auto ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                         <div className="flex flex-col h-full">
                             <h3 className="text-xl font-bold text-white mb-2">Keywords</h3>
@@ -656,29 +671,14 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                                 Add Keyword
                             </button>
-                                                        <div className="flex-grow overflow-y-auto">
+                            <div className="flex-grow overflow-y-auto">
                                 {(() => {
                                     const sidebarStructure = [
-                                        {
-                                            category: 'Lead quality',
-                                            keywords: ['quality', 'cold', 'fake', 'appointments', 'reviews', 'DNC', 'Competetors']
-                                        },
-                                        {
-                                            category: 'Compliance',
-                                            keywords: ['compliance', 'consent', 'DNC', 'Personal']
-                                        },
-                                        {
-                                            category: 'Pricing',
-                                            keywords: ['expensive', 'Setup fee', 'upfront']
-                                        },
-                                        {
-                                            category: 'Timing',
-                                            keywords: ['time', 'research', 'ready', 'partner']
-                                        },
-                                        {
-                                            category: 'Specification',
-                                            keywords: ['zip', 'high', 'older', 'younger']
-                                        }
+                                        { category: 'Lead quality', keywords: ['quality', 'cold', 'fake', 'appointments', 'reviews', 'DNC', 'Competetors'] },
+                                        { category: 'Compliance', keywords: ['compliance', 'consent', 'DNC', 'Personal'] },
+                                        { category: 'Pricing', keywords: ['expensive', 'Setup fee', 'upfront'] },
+                                        { category: 'Timing', keywords: ['time', 'research', 'ready', 'partner'] },
+                                        { category: 'Specification', keywords: ['zip', 'high', 'older', 'younger'] }
                                     ];
 
                                     const allCategorizedKeywords = new Set(sidebarStructure.flatMap(g => g.keywords));
@@ -693,10 +693,7 @@
                                                         {group.keywords.map(kw => (
                                                             keywords[kw] && (
                                                                 <li key={kw}>
-                                                                    <button
-                                                                        onClick={() => handleKeywordClick(kw)}
-                                                                        className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize"
-                                                                    >
+                                                                    <button onClick={() => handleKeywordClick(kw)} className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize">
                                                                         {kw}
                                                                     </button>
                                                                 </li>
@@ -711,10 +708,7 @@
                                                     <ul className="space-y-1">
                                                         {otherKeywords.map(kw => (
                                                             <li key={kw}>
-                                                                <button
-                                                                    onClick={() => handleKeywordClick(kw)}
-                                                                    className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize"
-                                                                >
+                                                                <button onClick={() => handleKeywordClick(kw)} className="w-full text-left p-2 pl-6 rounded text-gray-300 hover:bg-gray-700 hover:text-white transition-colors capitalize">
                                                                     {kw}
                                                                 </button>
                                                             </li>
@@ -728,7 +722,22 @@
                             </div>
                         </div>
                     </aside>
-                    <KeywordEditorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} keywords={keywords} setKeywords={setKeywords} toast={toast} initialKeyword={editingKeyword} />
+                );
+            };
+
+            return (
+                <div className={`relative min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'pl-64' : 'pl-0'}`}>
+                    <Sidebar />
+                    <KeywordEditorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} keywords={keywords} onSaveKeywords={handleSaveKeywords} toast={toast} initialKeyword={editingKeyword} />
+                    <ResponseCardModal 
+                        isOpen={!!activeKeywordResponse}
+                        onClose={closeResponseCard}
+                        onBack={handleGoBack}
+                        onKeywordClick={handleKeywordClick}
+                        responseKeyword={activeKeywordResponse}
+                        keywords={keywords}
+                        historyLength={responseHistory.length}
+                    />
                     <ToastContainer />
                     {view === 'main' ? <MainView /> : <DeckView />}
                     {bottomNotification && (
